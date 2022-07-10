@@ -1,4 +1,4 @@
-package me.wkai.prac_character.data.api.model
+package me.wkai.prac_character.data.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

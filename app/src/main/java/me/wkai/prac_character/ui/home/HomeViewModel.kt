@@ -1,12 +1,13 @@
 package me.wkai.prac_character.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import me.wkai.prac_character.data.api.model.Character
+import me.wkai.prac_character.data.model.Character
 import me.wkai.prac_character.data.repository.CharacterRepo
 import javax.inject.Inject
 
@@ -15,8 +16,10 @@ import javax.inject.Inject
 //Hilt:
 //@HiltViewModel: 有使用Hilt的ViewModel需要加 (會幫處理好ViewModelProvider.Factory的東西)
 //@Inject 在class用表示此class是可被注入的
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+	//注入_角色存儲庫(所以在ui創vm時不用自己處理Factory的東西了)
 	private val characterRepo:CharacterRepo
 ) : ViewModel() {
 
@@ -31,13 +34,19 @@ class HomeViewModel @Inject constructor(
 	fun getCharacters() = viewModelScope.launch {
 		// _characters.value = emptyList()
 		_isLoading.value = true
-		val characters = characterRepo.getCharacters()
-		_characters.value = characters
+		runCatching {
+			characterRepo.getCharacters()
+		}.onSuccess { characters ->
+			_characters.value = characters
+		}.onFailure {
+			it.printStackTrace()
+			// 或自訂 errorHandle(it)
+		}
 		_isLoading.value = false
 	}
 
 	//初始化
-//	init {
-//		getCharacters()
-//	}
+	//init {
+	//	getCharacters()
+	//}
 }

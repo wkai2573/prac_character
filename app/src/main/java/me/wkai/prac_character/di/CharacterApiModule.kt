@@ -11,23 +11,19 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
-//todo 須研究(Hilt)
-//@Module : 標注在 class 上，代表這個 class 包含著一到多個標註了 @Provide 的 function。
-//@Provide : 標注在 function 上，代表這個 function 會提供 dependency。
-//@Inject : 這其實是 Java 的物件，代表物件會被外部設定。
-//@Component : @Module 跟需要 dependency 的物件中間的橋樑。
+//Hilt:
+// https://www.carhy.com.tw/%E7%99%BC%E7%87%92%E8%BB%8A%E8%A8%8A/android%E5%AE%98%E6%96%B9%E6%96%B0%E6%8E%A8%E7%9A%84di%E5%BA%AB-hilt/
+// @Module: 標記這是一個module, 裡面提供了@Provides (在Kotlin,module可以是object)
+// @InstallIn: 使用Hilt時,所有Dagger模塊需要此註釋,通常用單例(SingletonComponent),也可指定要共用此模塊的Component
+//  @Provides: 標記方法, 提供"返回值類型"的依賴 (fun名不重要,他會根據回傳的型別自動找要用的fun呼叫)
+//  @Binds: 標記抽象方法, 返回接口類型, 實現是方法的唯一參數.
+//  @Singleton: application container的scope, 說明是application範圍內的單例.
+//  @ActivityScoped對應activity component.
 @Module
-@InstallIn(SingletonComponent::class) //SingletonComponent = 與Application共生死
+@InstallIn(SingletonComponent::class)
 object CharacterApiModule {
 
-	@Provides
-	@Singleton
-	fun provideApi(builder:Retrofit.Builder): CharacterApi {
-		return builder
-			.build()
-			.create(CharacterApi::class.java)
-	}
-
+	//生成 builder(請求器), 在此文件有呼叫
 	@Provides
 	@Singleton
 	fun provideRetrofit(): Retrofit.Builder {
@@ -36,4 +32,12 @@ object CharacterApiModule {
 			.addConverterFactory(MoshiConverterFactory.create())
 	}
 
+  //生成_角色Api, 在CharacterRepo有呼叫
+	@Provides
+	@Singleton
+	fun provideApi(builder:Retrofit.Builder): CharacterApi {
+		return builder
+			.build()
+			.create(CharacterApi::class.java)
+	}
 }
