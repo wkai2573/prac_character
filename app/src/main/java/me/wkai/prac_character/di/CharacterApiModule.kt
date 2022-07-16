@@ -1,11 +1,10 @@
 package me.wkai.prac_character.di
 
-import android.util.Log
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.wkai.prac_character.data.api.ApiConstants
+import me.wkai.prac_character.data.api.ApiConst
 import me.wkai.prac_character.data.api.CharacterApi
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -28,7 +27,7 @@ object CharacterApiModule {
 	@Singleton
 	fun provideRetrofit(): Retrofit.Builder {
 		return Retrofit.Builder()
-			.baseUrl(ApiConstants.BASE_URL)
+			.baseUrl(ApiConst.BASE_URL)
 			.addConverterFactory(MoshiConverterFactory.create())
 	}
 

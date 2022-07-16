@@ -1,6 +1,9 @@
 package me.wkai.prac_character.ui.home
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +19,7 @@ import javax.inject.Inject
 //Hilt:
 //@HiltViewModel: 有使用Hilt的ViewModel需要加 (會幫處理好ViewModelProvider.Factory的東西)
 //@Inject 在class用表示此class是可被注入的
+data class Foo(val text:String = "")
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -34,13 +38,13 @@ class HomeViewModel @Inject constructor(
 	fun getCharacters() = viewModelScope.launch {
 		// _characters.value = emptyList()
 		_isLoading.value = true
-		runCatching {
-			characterRepo.getCharacters()
-		}.onSuccess { characters ->
-			_characters.value = characters
-		}.onFailure {
-			it.printStackTrace()
-			// 或自訂 errorHandle(it)
+
+		characterRepo.getCharacters().also { response ->
+			if (response.isSuccessful) {
+				_characters.value = response.body()!!
+			} else {
+				Log.i("@@@", response.message())
+			}
 		}
 		_isLoading.value = false
 	}

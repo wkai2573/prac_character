@@ -1,7 +1,7 @@
 package me.wkai.prac_character.data.api
 
 import me.wkai.prac_character.data.model.Character
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 //Retrofit2:
@@ -11,7 +11,7 @@ import retrofit2.http.*
 //角色Api(也有人會用Service)
 interface CharacterApi {
 
-	@GET(ApiConstants.END_POINTS)
-	suspend fun getCharacter():List<Character>
+	@GET(ApiConst.END_POINTS)
+	suspend fun getCharacter():Response<List<Character>>
 
 }

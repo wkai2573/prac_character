@@ -11,22 +11,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import me.wkai.prac_character.data.model.Character
 import me.wkai.prac_character.ui.LoadingCard
 
 @Composable
-fun HomeScreen() {
-	val homeViewModel = viewModel(modelClass = HomeViewModel::class.java)
-	val characters by homeViewModel.characters.collectAsState()
-	val isLoading by homeViewModel.isLoading.collectAsState()
+fun HomeScreen(
+	viewModel:HomeViewModel = hiltViewModel()
+) {
+	val characters by viewModel.characters.collectAsState()
+	val isLoading by viewModel.isLoading.collectAsState()
 
 	Column {
 		//讀取按鈕
 		Button(
 			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			onClick = { homeViewModel.getCharacters() },
+			onClick = { viewModel.getCharacters() },
 			content = { Text("getCharacters", fontSize = 30.sp) }
 		)
 		Divider(color = Color.Gray)
