@@ -1,11 +1,15 @@
 package me.wkai.prac_character.di
 
+import android.app.Application
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.wkai.prac_character.data.api.ApiConst
 import me.wkai.prac_character.data.api.CharaApi
+import me.wkai.prac_character.data.db.CharaDao
+import me.wkai.prac_character.data.db.CharaDatabase
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -22,21 +26,44 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CharaApiModule {
 
+	//==Retrofit==
+
 	//生成 builder(請求器), 在此文件有呼叫
 	@Provides
 	@Singleton
-	fun provideRetrofit(): Retrofit.Builder {
+	fun provideRetrofit():Retrofit.Builder {
 		return Retrofit.Builder()
 			.baseUrl(ApiConst.BASE_URL)
 			.addConverterFactory(MoshiConverterFactory.create())
 	}
 
-  //生成_角色Api, 在charaRepo有呼叫
+	//生成_角色Api, 在charaRepo有呼叫
 	@Provides
 	@Singleton
-	fun provideApi(builder:Retrofit.Builder): CharaApi {
+	fun provideApi(builder:Retrofit.Builder):CharaApi {
 		return builder
 			.build()
 			.create(CharaApi::class.java)
+	}
+
+	//==Room==
+
+	//生成db
+	@Provides
+	@Singleton
+	fun provideCharaDatabase(app:Application):CharaDatabase {
+		return Room.databaseBuilder(
+			app,
+			CharaDatabase::class.java,
+			CharaDatabase.DATABASE_NAME
+		)
+			.build()
+	}
+
+	//生成dao
+	@Provides
+	@Singleton
+	fun provideCharaDao(db:CharaDatabase):CharaDao {
+		return db.charaDao
 	}
 }

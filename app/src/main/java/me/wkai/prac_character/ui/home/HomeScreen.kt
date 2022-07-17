@@ -1,6 +1,5 @@
 package me.wkai.prac_character.ui.home
 
-import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,7 +25,7 @@ fun HomeScreen(
 	Column {
 		//讀取按鈕
 		Row(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			modifier = Modifier.fillMaxWidth().padding(4.dp),
 			horizontalArrangement = Arrangement.SpaceAround,
 		) {
 			Button(
@@ -37,9 +36,31 @@ fun HomeScreen(
 				onClick = { viewModel.getCharaList() },
 				content = { Text("normal") }
 			)
+		}
+		Row(
+			modifier = Modifier.fillMaxWidth().padding(4.dp),
+			horizontalArrangement = Arrangement.SpaceAround,
+		) {
+			Button(
+				onClick = { viewModel.getCharaList_flow_noSave() },
+				content = { Text("Flow_noSave") }
+			)
 			Button(
 				onClick = { viewModel.getCharaList_flow() },
-				content = { Text("Flow") }
+				content = { Text("save") }
+			)
+			Button(
+				onClick = { viewModel.getCharaList_flow_unity() },
+				content = { Text("unity") }
+			)
+		}
+		Row(
+			modifier = Modifier.fillMaxWidth().padding(4.dp),
+			horizontalArrangement = Arrangement.SpaceAround,
+		) {
+			Button(
+				onClick = { viewModel.getData() },
+				content = { Text("test") }
 			)
 		}
 		Divider(color = Color.Gray)
