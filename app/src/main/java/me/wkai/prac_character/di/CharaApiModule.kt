@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.wkai.prac_character.data.api.ApiConst
-import me.wkai.prac_character.data.api.CharacterApi
+import me.wkai.prac_character.data.api.CharaApi
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -20,7 +20,7 @@ import javax.inject.Singleton
 //  @ActivityScoped對應activity component.
 @Module
 @InstallIn(SingletonComponent::class)
-object CharacterApiModule {
+object CharaApiModule {
 
 	//生成 builder(請求器), 在此文件有呼叫
 	@Provides
@@ -31,12 +31,12 @@ object CharacterApiModule {
 			.addConverterFactory(MoshiConverterFactory.create())
 	}
 
-  //生成_角色Api, 在CharacterRepo有呼叫
+  //生成_角色Api, 在charaRepo有呼叫
 	@Provides
 	@Singleton
-	fun provideApi(builder:Retrofit.Builder): CharacterApi {
+	fun provideApi(builder:Retrofit.Builder): CharaApi {
 		return builder
 			.build()
-			.create(CharacterApi::class.java)
+			.create(CharaApi::class.java)
 	}
 }

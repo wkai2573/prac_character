@@ -1,17 +1,13 @@
 package me.wkai.prac_character.ui.home
 
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import me.wkai.prac_character.data.model.Character
-import me.wkai.prac_character.data.repository.CharacterRepo
+import kotlinx.coroutines.flow.*
+import me.wkai.prac_character.data.model.Chara
+import me.wkai.prac_character.data.repository.CharaRepository
 import javax.inject.Inject
 
 //MVVM & StateFlow說明: https://blog.csdn.net/Androiddddd/article/details/121931065
@@ -19,12 +15,10 @@ import javax.inject.Inject
 //Hilt:
 //@HiltViewModel: 有使用Hilt的ViewModel需要加 (會幫處理好ViewModelProvider.Factory的東西)
 //@Inject 在class用表示此class是可被注入的
-data class Foo(val text:String = "")
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	//注入_角色存儲庫(所以在ui創vm時不用自己處理Factory的東西了)
-	private val characterRepo:CharacterRepo
+	private val charaRepository:CharaRepository
 ) : ViewModel() {
 
 	//讀取中
@@ -32,16 +26,31 @@ class HomeViewModel @Inject constructor(
 	val isLoading:StateFlow<Boolean> = _isLoading
 
 	//角色清單(StateFlow≒LiveData)
-	private val _characters = MutableStateFlow(emptyList<Character>())
-	val characters:StateFlow<List<Character>> = _characters
+	private val _charaList = MutableStateFlow(emptyList<Chara>())
+	val charaList:StateFlow<List<Chara>> = _charaList
 
-	fun getCharacters() = viewModelScope.launch {
-		// _characters.value = emptyList()
+	//請求_無包裝
+	fun getCharaList() = viewModelScope.launch {
+//		_charaList.value = emptyList()
 		_isLoading.value = true
+		runCatching {
+			charaRepository.getCharaList()
+		}.onSuccess {
+			_charaList.value = it
+		}.onFailure {
+			//處理錯誤
+			Log.i("@@@", it.message ?: "getCharaList error")
+		}
+		_isLoading.value = false
+	}
 
-		characterRepo.getCharacters().also { response ->
+	//請求_包request (timeout會拋錯)
+	fun getCharaList_request() = viewModelScope.launch {
+//		_charaList.value = emptyList()
+		_isLoading.value = true
+		charaRepository.getCharaList_request().also { response ->
 			if (response.isSuccessful) {
-				_characters.value = response.body()!!
+				_charaList.value = response.body()!!
 			} else {
 				Log.i("@@@", response.message())
 			}
@@ -49,8 +58,32 @@ class HomeViewModel @Inject constructor(
 		_isLoading.value = false
 	}
 
-	//初始化
-	//init {
-	//	getCharacters()
-	//}
+	private var job_getCharaList:Job? = null
+
+	//請求_包Flow (可以解決重複請求問題)
+	fun getCharaList_flow() {
+		job_getCharaList?.cancel()
+		job_getCharaList = charaRepository.getCharaList_flow()
+			.onStart {
+				Log.i("@@@", "start")
+				//請求前處理
+				_isLoading.value = true
+			}
+			.onEach {
+				Log.i("@@@", "onEach")
+				//成功處理
+				_charaList.value = it
+			}
+			.onCompletion {
+				Log.i("@@@", "onCompletion")
+				//結束處理
+				_isLoading.value = false
+			}
+			.catch {
+				//異常處理
+				Log.i("@@@", it.message.toString())
+			}
+			.launchIn(viewModelScope)
+	}
+
 }

@@ -9,7 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import me.wkai.prac_character.ui.home.HomeScreen
-import me.wkai.prac_character.ui.theme.Prac_characterTheme
+import me.wkai.prac_character.ui.theme.prac_characterTheme
 
 /**
  * 練習_使用技術
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState:Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			Prac_characterTheme {
+			prac_characterTheme {
 				Surface(
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colors.background
