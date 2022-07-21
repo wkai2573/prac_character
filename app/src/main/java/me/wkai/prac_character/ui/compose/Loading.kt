@@ -1,4 +1,4 @@
-package me.wkai.prac_character.ui
+package me.wkai.prac_character.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

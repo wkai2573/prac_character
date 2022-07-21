@@ -1,4 +1,4 @@
-package me.wkai.prac_character.ui.home
+package me.wkai.prac_character.ui.screen.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -31,6 +31,12 @@ class HomeViewModel @Inject constructor(
 	private val _charaList = MutableStateFlow(emptyList<Chara>())
 	val charaList:StateFlow<List<Chara>> = _charaList
 
+	//==清空==
+	fun clearAllChara() = viewModelScope.launch {
+		_charaList.value = emptyList()
+	}
+
+	//==取得Chara==
 	//請求_無包裝
 	fun getCharaList() = viewModelScope.launch {
 //		_charaList.value = emptyList()
@@ -144,7 +150,8 @@ class HomeViewModel @Inject constructor(
 			.launchIn(viewModelScope)
 	}
 
-	//多來源測試: 有三種抓資料方式，前面失敗 則用下一種方式
+	//==多來源測試==
+	// 有三種抓資料方式，前面失敗 則用下一種方式
 	fun getData() {
 		flow {
 			emit(getData1())

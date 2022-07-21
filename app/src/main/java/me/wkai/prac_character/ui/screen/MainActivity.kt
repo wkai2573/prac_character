@@ -1,4 +1,4 @@
-package me.wkai.prac_character
+package me.wkai.prac_character.ui.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import me.wkai.prac_character.ui.home.HomeScreen
+import me.wkai.prac_character.ui.screen.home.HomeScreen
 import me.wkai.prac_character.ui.theme.prac_characterTheme
 
 /**
