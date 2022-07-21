@@ -1,4 +1,4 @@
-package me.wkai.prac_character.ui.compose
+package me.wkai.prac_character.ui.compose.multifab
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

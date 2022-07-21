@@ -1,26 +1,23 @@
-package me.wkai.prac_character.ui.compose
+package me.wkai.prac_character.ui.compose.multifab
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key.Companion.F
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun MultiFloatingActionButton(
@@ -47,15 +44,6 @@ fun MultiFloatingActionButton(
 			if (state == MultiFabState.EXPANDED) 1f else 0f
 		},
 	)
-	val shadow:Dp by transition.animateDp(
-		label = "shadow",
-		transitionSpec = {
-			tween(durationMillis = 50)
-		},
-		targetValueByState = { state ->
-			if (state == MultiFabState.EXPANDED) 2.dp else 0.dp
-		}
-	)
 	val rotation:Float by transition.animateFloat(
 		label = "rotation",
 		targetValueByState = { state ->
@@ -63,7 +51,9 @@ fun MultiFloatingActionButton(
 		}
 	)
 
-	Column(horizontalAlignment = Alignment.End) {
+	Column(
+		horizontalAlignment = Alignment.End
+	) {
 		if (
 			transition.currentState == MultiFabState.EXPANDED ||
 			transition.isRunning
@@ -72,12 +62,11 @@ fun MultiFloatingActionButton(
 				MiniFabItem(
 					item = item,
 					alpha = alpha,
-					shadow = shadow,
 					scale = scale,
 					showLabel = showLabels,
 					style = style
 				)
-				Spacer(modifier = Modifier.height(15.dp))
+				Spacer(modifier = Modifier.height(12.dp))
 			}
 		}
 		FloatingActionButton(onClick = {
@@ -101,40 +90,50 @@ fun MultiFloatingActionButton(
 private fun MiniFabItem(
 	item:MultiFabItem,
 	alpha:Float,
-	shadow:Dp,
 	scale:Float,
 	showLabel:Boolean,
 	style:TextStyle = LocalTextStyle.current
 ) {
-	val fabColor = MaterialTheme.colors.secondary
-	val maxHeight = 50f
-
 	Row(
-		modifier = Modifier.height(maxHeight.dp).padding(end = 6.dp),
+		modifier = Modifier
+			.alpha(animateFloatAsState(alpha).value)
+			.height(FabItemHeight)
+			.padding(end = 6.dp),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		if (showLabel) {
-			Text(
-				text = item.label,
-				style = style,
-				modifier = Modifier.alpha(animateFloatAsState(alpha).value)
-					.shadow(animateDpAsState(shadow).value)
-					.background(color = MaterialTheme.colors.surface)
-					.padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
-			)
+			Surface(
+				shape = RoundedCornerShape(3.dp),
+				color = MaterialTheme.colors.background,
+				elevation = 3.dp
+			) {
+				Text(
+					text = item.label,
+					style = style,
+					modifier = Modifier.padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
+				)
+			}
 			Spacer(modifier = Modifier.width(16.dp))
 		}
 		Surface(
 			modifier = Modifier.size(scale.dp),
 			shape = CircleShape,
-			color = fabColor,
+			color = MaterialTheme.colors.secondary,
+			elevation = 3.dp
 		) {
-			Image(
-				modifier = Modifier.clickable(onClick = item.onClick),
-				imageVector = item.icon,
-				contentDescription = null,
-				contentScale = ContentScale.None,
-			)
+			Box(
+				modifier = Modifier
+					.clickable(onClick = item.onClick)
+					.size(8.dp)
+			) {
+				Icon(
+					modifier = Modifier.align(Alignment.Center),
+					imageVector = item.icon,
+					contentDescription = null,
+				)
+			}
 		}
 	}
 }
+
+private val FabItemHeight = 50f.dp
