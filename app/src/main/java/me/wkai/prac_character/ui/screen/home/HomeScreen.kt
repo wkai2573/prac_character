@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import me.wkai.prac_character.data.model.Chara
@@ -27,12 +28,12 @@ import me.wkai.prac_character.ui.compose.multifab.MultiFloatingActionButton
 
 @Composable
 fun HomeScreen(
-	viewModel:HomeViewModel = hiltViewModel()
+	viewModel:HomeViewModel = hiltViewModel(),
+	navController:NavHostController
 ) {
 	val charaList by viewModel.charaList.collectAsState()
 	val isLoading by viewModel.isLoading.collectAsState()
 
-	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberScaffoldState() //鷹架state
 	var fabState by remember { mutableStateOf(MultiFabState.COLLAPSED) } //浮動按鈕state
 
@@ -66,20 +67,7 @@ fun HomeScreen(
 				showLabels = true,
 				style = MaterialTheme.typography.body2,
 			)
-		},
-		topBar = {
-			TopAppBar(
-				title = { Text(text = "App Name", style = MaterialTheme.typography.h6) },
-				backgroundColor = MaterialTheme.colors.primarySurface,
-				navigationIcon = {
-					IconButton(
-						onClick = { scope.launch { scaffoldState.drawerState.open() } },
-						content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
-					)
-				}
-			)
-		},
-		drawerContent = { Drawer(drawerState = scaffoldState.drawerState) },
+		}
 	) {
 		Box {
 			//清單

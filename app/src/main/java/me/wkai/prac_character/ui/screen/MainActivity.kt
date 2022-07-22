@@ -4,11 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import me.wkai.prac_character.ui.compose.Drawer
 import me.wkai.prac_character.ui.screen.home.HomeScreen
+import me.wkai.prac_character.ui.screen.scan.ScanScreen
 import me.wkai.prac_character.ui.theme.prac_characterTheme
 
 /**
@@ -39,7 +49,60 @@ class MainActivity : ComponentActivity() {
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colors.background
 				) {
-					HomeScreen()
+
+					val scope = rememberCoroutineScope()
+					val scaffoldState = rememberScaffoldState() //鷹架state
+
+					//nav
+					val navController = rememberNavController()
+					val navScreenState = remember { mutableStateOf<Screen>(Screen.HomeScreen) }
+
+					Scaffold(
+						scaffoldState = scaffoldState,
+						topBar = {
+							TopAppBar(
+								title = { Text(text = "App Name", style = MaterialTheme.typography.h6) },
+								backgroundColor = MaterialTheme.colors.primarySurface,
+								navigationIcon = {
+									IconButton(
+										onClick = { scope.launch { scaffoldState.drawerState.open() } },
+										content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
+									)
+								}
+							)
+						},
+						drawerContent = {
+							Drawer(
+								drawerState = scaffoldState.drawerState,
+								navController = navController,
+							)
+						},
+					) {
+						NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+							//第一頁
+							composable(route = Screen.HomeScreen.route) {
+								HomeScreen(navController = navController)
+							}
+							//第二頁 (傳參數範例)
+							composable(
+								route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
+								arguments = listOf(
+									navArgument(name = "fooIndex") {
+										type = NavType.IntType
+										defaultValue = -1
+									},
+									navArgument(name = "fooColor") {
+										type = NavType.IntType
+										defaultValue = -1
+									}
+								)
+							) {
+								val color = it.arguments?.getInt("fooColor") ?: -1
+								ScanScreen(navController = navController)
+							}
+						}
+					}
+
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package me.wkai.prac_character.ui.screen.home
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ class HomeViewModel @Inject constructor(
 	//注入_角色存儲庫(所以在ui創vm時不用自己處理Factory的東西了)
 	private val repository:CharaRepository,
 	private val dao:CharaDao,
+	savedStateHandle:SavedStateHandle, //導航參數(hilt注入)
 ) : ViewModel() {
 
 	//讀取中
