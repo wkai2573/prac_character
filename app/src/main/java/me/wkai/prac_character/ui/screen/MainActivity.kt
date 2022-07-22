@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 						topBar = {
 							TopAppBar(
 								title = { Text(text = "App Name", style = MaterialTheme.typography.h6) },
-								backgroundColor = MaterialTheme.colors.primarySurface,
+								backgroundColor = MaterialTheme.colors.primary,
 								navigationIcon = {
 									IconButton(
 										onClick = { scope.launch { scaffoldState.drawerState.open() } },

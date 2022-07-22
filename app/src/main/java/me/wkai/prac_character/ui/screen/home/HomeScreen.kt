@@ -1,22 +1,20 @@
 package me.wkai.prac_character.ui.screen.home
 
-import android.util.Log
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -76,55 +74,61 @@ fun HomeScreen(
 			)
 		}
 	) {
-		Box {
-			//清單
-//			val smartSwipeRefreshState = SmartSwipeRefreshState()
-			SmartSwipeRefresh(
-//				state = smartSwipeRefreshState,
-				loadingIndicator = {
-					Surface(
-						modifier = Modifier.padding(vertical = 10.dp),
-						shape = CircleShape,
-						elevation = 5.dp,
-					) {
-						Icon(
-							imageVector = Icons.Default.Refresh,
-							contentDescription = "refresh",
-//							modifier = Modifier.rotate(smartSwipeRefreshState.indicatorOffset.value)
-						)
-					}
-				},
-				onRefresh = {
-					viewModel.getCharaList_flow_unity()
-				},
-			) {
-				LazyColumn {
-					itemsIndexed(charaList) { index:Int, chara:Chara ->
-						CharaCard(chara = chara, isReverse = index % 2 == 1)
-					}
+
+		//下拉刷新icon旋轉動畫
+		val smartSwipeRefreshState = remember { SmartSwipeRefreshState() }
+		val transition:Transition<SmartSwipeRefreshState> = updateTransition(smartSwipeRefreshState, "transition")
+		val rotation by transition.animateFloat(label = "rotation") {
+			it.indicatorOffset.value * 8
+		}
+		//清單(with下拉刷新)
+		SmartSwipeRefresh(
+			state = smartSwipeRefreshState,
+			loadingIndicator = {
+				Surface(
+					modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
+					color = MaterialTheme.colors.background,
+					shape = CircleShape,
+					elevation = 5.dp,
+				) {
+					Icon(
+						modifier = Modifier.size(30.dp).rotate(rotation),
+						imageVector = Icons.Default.Refresh,
+						contentDescription = "refresh",
+					)
+				}
+			},
+			onRefresh = {
+				viewModel.getCharaList_flow_unity()
+			},
+		) {
+			LazyColumn {
+				itemsIndexed(charaList) { index:Int, chara:Chara ->
+					CharaCard(chara = chara, isReverse = index % 2 == 1)
 				}
 			}
-			//讀取遮罩
-			AnimatedVisibility(
-				visible = isLoading,
-				enter = fadeIn() + slideInVertically(),
-				exit = fadeOut() + slideOutVertically(),
-			) {
-				LoadingCard()
-			}
-			//浮動按鈕遮罩
-			AnimatedVisibility(
-				visible = fabState == MultiFabState.EXPANDED,
-				enter = fadeIn(),
-				exit = fadeOut(),
-			) {
-				Box(
-					modifier = Modifier
-						.fillMaxSize()
-						.background(Color.Gray.copy(alpha = 0.4f))
-						.clickable(enabled = false) {} //擋住後面元件點擊事件
-				)
-			}
+		}
+
+		//讀取遮罩
+		AnimatedVisibility(
+			visible = isLoading,
+			enter = fadeIn() + slideInVertically(),
+			exit = fadeOut() + slideOutVertically(),
+		) {
+			LoadingCard()
+		}
+		//浮動按鈕遮罩
+		AnimatedVisibility(
+			visible = fabState == MultiFabState.EXPANDED,
+			enter = fadeIn(),
+			exit = fadeOut(),
+		) {
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(Color.Gray.copy(alpha = 0.4f))
+					.clickable(enabled = false) {} //擋住後面元件點擊事件
+			)
 		}
 	}
 }
