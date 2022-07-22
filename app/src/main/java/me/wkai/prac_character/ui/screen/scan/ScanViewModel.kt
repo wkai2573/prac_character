@@ -6,7 +6,4 @@ class ScanViewModel(
 
 ) : ViewModel() {
 
-
-
-
 }

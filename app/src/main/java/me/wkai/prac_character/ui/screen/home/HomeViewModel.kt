@@ -190,4 +190,9 @@ class HomeViewModel @Inject constructor(
 		return 3
 	}
 
+	//==初始化==
+	init {
+		getCharaList_flow_unity()
+	}
+
 }
