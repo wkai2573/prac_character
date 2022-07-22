@@ -5,6 +5,8 @@
 
   <!-- 權限:網路 -->
   <uses-permission android:name="android.permission.INTERNET"/>
+  <!-- 權限:相機 -->
+  <uses-permission android:name="android.permission.CAMERA" />
 
   <!-- 用Hilt 要加 android:name -->
   <!-- 用非安全HTTP 要加指定網域 android:networkSecurityConfig -->
