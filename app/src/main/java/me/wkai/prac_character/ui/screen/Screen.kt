@@ -1,6 +1,19 @@
 package me.wkai.prac_character.ui.screen
 
-sealed class Screen(val route:String) {
-	object HomeScreen : Screen("home_screen")
-	object ScanScreen : Screen("scan_screen")
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Scanner
+import androidx.compose.ui.graphics.vector.ImageVector
+
+sealed class Screen(
+	val route:String,
+	val text:String,
+	val icon:ImageVector
+) {
+	object HomeScreen : Screen("home_screen", "Home", Icons.Outlined.Home)
+	object ScanScreen : Screen("scan_screen", "Scan", Icons.Outlined.Scanner)
+
+	companion object {
+		val Screens = listOf(HomeScreen, ScanScreen)
+	}
 }

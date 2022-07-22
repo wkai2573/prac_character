@@ -49,19 +49,17 @@ class MainActivity : ComponentActivity() {
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colors.background
 				) {
-
 					val scope = rememberCoroutineScope()
 					val scaffoldState = rememberScaffoldState() //鷹架state
 
 					//nav
 					val navController = rememberNavController()
-					val navScreenState = remember { mutableStateOf<Screen>(Screen.HomeScreen) }
 
 					Scaffold(
 						scaffoldState = scaffoldState,
 						topBar = {
 							TopAppBar(
-								title = { Text(text = "App Name", style = MaterialTheme.typography.h6) },
+								title = { Text(text = "Character 角色", style = MaterialTheme.typography.h6) },
 								backgroundColor = MaterialTheme.colors.primary,
 								navigationIcon = {
 									IconButton(

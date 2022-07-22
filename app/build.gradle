@@ -98,15 +98,16 @@ dependencies {
 
     //Coroutines: 用途還不明
     // https://github.com/Kotlin/kotlinx.coroutines
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1"
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
+    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1"
+    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
 
-    // CameraX, https://developer.android.com/jetpack/androidx/releases/camera
+    //CameraX: 相機
+    // https://developer.android.com/jetpack/androidx/releases/camera
     implementation "androidx.camera:camera-camera2:1.1.0"
     implementation "androidx.camera:camera-lifecycle:1.1.0"
     implementation "androidx.camera:camera-view:1.1.0"
 
-    // Zxing
-    implementation 'com.google.zxing:core:3.3.3'
+    //Zxing: 掃描
+    implementation 'com.google.zxing:core:3.4.0'
 
 }

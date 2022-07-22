@@ -54,26 +54,18 @@ fun Drawer(
 			style = MaterialTheme.typography.h5,
 			modifier = Modifier.padding(start = 32.dp, top = 20.dp, bottom = 16.dp)
 		)
-		DrawerItem(
-			drawerState = drawerState,
-			text = "Home",
-			bubbleText = "",
-			imageVector = Icons.Outlined.Home,
-			selected = currentRoute == Screen.HomeScreen.route,
-			onClick = {
-				navController.navigate(route = Screen.HomeScreen.route, builder = navOptionsBuilder)
-			}
-		)
-		DrawerItem(
-			drawerState = drawerState,
-			text = "Scanner",
-			bubbleText = "",
-			imageVector = Icons.Outlined.Scanner,
-			selected = currentRoute == Screen.ScanScreen.route,
-			onClick = {
-				navController.navigate(route = Screen.ScanScreen.route, builder = navOptionsBuilder)
-			}
-		)
+		Screen.Screens.forEach {
+			DrawerItem(
+				drawerState = drawerState,
+				text = it.text,
+				bubbleText = "",
+				imageVector = it.icon,
+				selected = currentRoute == it.route,
+				onClick = {
+					navController.navigate(route = it.route, builder = navOptionsBuilder)
+				}
+			)
+		}
 
 		Divider(Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
 
