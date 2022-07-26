@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import me.wkai.prac_character.broadcast.AppBroadcastReceiver
 import me.wkai.prac_character.ui.compose.Drawer
 import me.wkai.prac_character.ui.screen.home.HomeScreen
 import me.wkai.prac_character.ui.screen.scan.ScanScreen
@@ -43,6 +44,10 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState:Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		//註冊廣播
+		AppBroadcastReceiver.init(this)
+
 		setContent {
 			prac_characterTheme {
 				Surface(
