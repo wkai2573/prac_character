@@ -1,4 +1,4 @@
-package me.wkai.prac_character.broadcast
+package me.wkai.prac_character.util
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -14,7 +14,7 @@ class AppBroadcastReceiver : BroadcastReceiver() {
 	//當接收廣播
 	override fun onReceive(context:Context, intent:Intent) {
 		val msg = """
-			data:   ${intent.getStringExtra("data")}
+			data:   ${intent.getStringExtra("param")}
 			Action: ${intent.action}
 			URI:    ${intent.toUri(Intent.URI_INTENT_SCHEME)}
 		""".trimIndent()
@@ -23,13 +23,14 @@ class AppBroadcastReceiver : BroadcastReceiver() {
 
 	companion object {
 		//初始化，在activity onCreate呼叫
-		fun init(context: Context) {
+		fun init(context: Context):AppBroadcastReceiver {
 			val br = AppBroadcastReceiver()
 			val filter = IntentFilter().apply {
 				//可接收的廣播
 				addAction("me.wkai.NOTICE_ME_SENPAI")
 			}
 			context.registerReceiver(br, filter)
+			return br
 		}
 	}
 }

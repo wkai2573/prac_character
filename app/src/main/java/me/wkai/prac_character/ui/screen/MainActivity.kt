@@ -16,8 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.wkai.prac_character.broadcast.AppBroadcastReceiver
+import me.wkai.prac_character.util.AppBroadcastReceiver
 import me.wkai.prac_character.ui.compose.Drawer
+import me.wkai.prac_character.ui.screen.chara.CharaScreen
 import me.wkai.prac_character.ui.screen.home.HomeScreen
 import me.wkai.prac_character.ui.screen.scan.ScanScreen
 import me.wkai.prac_character.ui.theme.prac_characterTheme
@@ -82,11 +83,15 @@ class MainActivity : ComponentActivity() {
 						},
 					) {
 						NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
-							//第一頁
+							//Home
 							composable(route = Screen.HomeScreen.route) {
 								HomeScreen(navController = navController)
 							}
-							//第二頁 (傳參數範例)
+							//chara
+							composable(route = Screen.CharaScreen.route) {
+								CharaScreen(navController = navController)
+							}
+							//Scan (傳參數範例)
 							composable(
 								route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
 								arguments = listOf(

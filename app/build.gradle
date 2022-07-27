@@ -33,6 +33,8 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        //出現錯誤需添加: Inheritance from an interface with '@JvmDefault' members is only allowed with -Xjvm-default option
+        freeCompilerArgs = ['-Xjvm-default=compatibility']
     }
     buildFeatures {
         compose true
@@ -83,8 +85,9 @@ dependencies {
     implementation "androidx.room:room-ktx:2.4.2"
 
     //==Compose相關==
-    implementation "androidx.compose.material:material-icons-extended:1.1.1" //icon
-    implementation "androidx.navigation:navigation-compose:2.5.0"            //導航
+    implementation "androidx.compose.material:material-icons-extended:1.1.1"  //icon
+    implementation "androidx.navigation:navigation-compose:2.5.0"             //導航
+    implementation "com.google.accompanist:accompanist-flowlayout:0.24.13-rc" //流水布局
 
     //Coil: 非同步圖片
     implementation "io.coil-kt:coil-compose:2.1.0"

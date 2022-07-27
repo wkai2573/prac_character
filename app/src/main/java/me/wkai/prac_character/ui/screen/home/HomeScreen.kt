@@ -1,174 +1,93 @@
 package me.wkai.prac_character.ui.screen.home
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.Transition
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.*
+import android.util.Log
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import me.wkai.prac_character.data.model.Chara
-import me.wkai.prac_character.ui.compose.LoadingCard
-import me.wkai.prac_character.ui.compose.multifab.MultiFabItem
-import me.wkai.prac_character.ui.compose.multifab.MultiFabState
-import me.wkai.prac_character.ui.compose.multifab.MultiFloatingActionButton
-import me.wkai.prac_character.ui.compose.swipe_refresh.SmartSwipeRefresh
-import me.wkai.prac_character.ui.compose.swipe_refresh.SmartSwipeRefreshState
+import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
-fun HomeScreen(
-	viewModel:HomeViewModel = hiltViewModel(),
-	navController:NavHostController
-) {
-	val charaList by viewModel.charaList.collectAsState()
-	val isLoading by viewModel.isLoading.collectAsState()
+fun HomeScreen(navController:NavHostController) {
 
-	val scaffoldState = rememberScaffoldState() //鷹架state
-	var fabState by remember { mutableStateOf(MultiFabState.COLLAPSED) } //浮動按鈕state
+	val context = LocalContext.current
 
-	Scaffold(
-		scaffoldState = scaffoldState,
-		floatingActionButton = {
-			MultiFloatingActionButton(
-				fabIcon = Icons.Default.Add,
-				items = listOf(
-					MultiFabItem(
-						icon = Icons.Default.Download,
-						label = "讀取",
-						onClick = {
-							viewModel.getCharaList_flow_unity()
-							fabState = MultiFabState.COLLAPSED
-						}
-					),
-					MultiFabItem(
-						icon = Icons.Default.Delete,
-						label = "刪除全部",
-						onClick = {
-							viewModel.clearAllChara()
-							fabState = MultiFabState.COLLAPSED
-						}
-					)
-				),
-				multiFabState = fabState,
-				stateChanged = {
-					fabState = it
-				},
-				showLabels = true,
-				style = MaterialTheme.typography.body2,
-			)
-		}
+	FlowRow(
+		modifier = Modifier.padding(8.dp),
+		crossAxisSpacing = 0.dp,
+		mainAxisSpacing = 8.dp
 	) {
-
-		//下拉刷新icon旋轉動畫
-		val smartSwipeRefreshState = remember { SmartSwipeRefreshState() }
-		val transition:Transition<SmartSwipeRefreshState> = updateTransition(smartSwipeRefreshState, "transition")
-		val rotation by transition.animateFloat(label = "rotation") {
-			it.indicatorOffset.value * 8
-		}
-		//清單(with下拉刷新)
-		SmartSwipeRefresh(
-			state = smartSwipeRefreshState,
-			loadingIndicator = {
-				Surface(
-					modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
-					color = MaterialTheme.colors.background,
-					shape = CircleShape,
-					elevation = 5.dp,
-				) {
-					Icon(
-						modifier = Modifier.size(30.dp).rotate(rotation),
-						imageVector = Icons.Default.Refresh,
-						contentDescription = "refresh",
-					)
-				}
-			},
-			onRefresh = {
-				viewModel.getCharaList_flow_unity()
-			},
-		) {
-			LazyColumn {
-				itemsIndexed(charaList) { index:Int, chara:Chara ->
-					CharaCard(chara = chara, isReverse = index % 2 == 1)
-				}
+		Button(
+			content = { Text(text = "綁定其他App服務") },
+			onClick = {
+				bindService(context)
 			}
+		)
+
+		Button(
+			content = { Text(text = "呼叫服務") },
+			onClick = {
+				sendMessage()
+			}
+		)
+	}
+}
+
+var messengerServer:Messenger? = null
+
+//綁定處理: 當綁定服務時
+val serviceConnection by lazy {
+	object : ServiceConnection {
+		override fun onServiceConnected(name:ComponentName?, service:IBinder?) {
+			messengerServer = Messenger(service)
 		}
 
-		//讀取遮罩
-		AnimatedVisibility(
-			visible = isLoading,
-			enter = fadeIn() + slideInVertically(),
-			exit = fadeOut() + slideOutVertically(),
-		) {
-			LoadingCard()
-		}
-		//浮動按鈕遮罩
-		AnimatedVisibility(
-			visible = fabState == MultiFabState.EXPANDED,
-			enter = fadeIn(),
-			exit = fadeOut(),
-		) {
-			Box(
-				modifier = Modifier
-					.fillMaxSize()
-					.background(Color.Gray.copy(alpha = 0.4f))
-					.clickable(enabled = false) {} //擋住後面元件點擊事件
-			)
+		override fun onServiceDisconnected(name:ComponentName?) {
+			messengerServer = null
 		}
 	}
 }
 
-@Composable
-fun CharaCard(chara:Chara, isReverse:Boolean = false) {
-	Card(
-		modifier = Modifier.padding(24.dp).height(160.dp),
-		shape = RoundedCornerShape(20.dp),
-		backgroundColor = MaterialTheme.colors.surface,
-		elevation = 5.dp
-	) {
-		Row {
-			if (isReverse) {
-				CharaText(chara)
-				CharaImage(chara)
-			} else {
-				CharaImage(chara)
-				CharaText(chara)
-			}
+//服務處理(客戶端): 當訊息傳至客戶端時
+val messengerClient by lazy {
+	val looper:Looper = Looper.getMainLooper()
+	Messenger(object : Handler(looper) {
+		override fun handleMessage(msgFromServer:Message) {
+			Log.i("@@@", "服務_客戶端_handle: ${msgFromServer.data.getString("param")}")
+			super.handleMessage(msgFromServer)
 		}
+	})
+}
+
+//綁定服務
+private fun bindService(context:Context) {
+	val intent = Intent().apply {
+		component = ComponentName(
+			"me.wkai.prac_android_compose",
+			"me.wkai.prac_android_compose.util.AppService"
+		)
+		putExtra("param", "客戶端bind參數")
 	}
+	context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
 }
 
-@Composable
-fun RowScope.CharaImage(chara:Chara) {
-	AsyncImage(
-		modifier = Modifier.weight(1f).fillMaxHeight(),
-		model = chara.image,
-		contentDescription = null,
-		contentScale = ContentScale.FillBounds
-	)
-}
-
-@Composable
-fun RowScope.CharaText(chara:Chara) {
-	Column(
-		modifier = Modifier.padding(12.dp).weight(1f).fillMaxHeight()
-	) {
-		Text(text = "Real name: ${chara.actor}", style = MaterialTheme.typography.body2, modifier = Modifier.padding(top = 8.dp))
-		Text(text = "Actor name: ${chara.name}", style = MaterialTheme.typography.body2, modifier = Modifier.padding(top = 8.dp))
+//呼叫服務
+private fun sendMessage() {
+	messengerServer?.apply {
+		val msgToServer = Message.obtain(null, 1)
+		msgToServer.replyTo = messengerClient //設定回復對象(如果服務需要回復的話才需要)
+		val bundle = Bundle()
+		bundle.putString("param", "客戶端msg參數")
+		msgToServer.data = bundle
+		send(msgToServer)
 	}
 }

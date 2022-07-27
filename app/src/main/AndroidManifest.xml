@@ -34,7 +34,7 @@
     </activity>
 
     <!-- 廣播 -->
-    <receiver android:name=".broadcast.AppBroadcastReceiver"  android:exported="true">
+    <receiver android:name=".util.AppBroadcastReceiver"  android:exported="true">
       <!-- 自訂的廣播不用添加<intent-filter> -->
     </receiver>
 

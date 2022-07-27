@@ -1,4 +1,4 @@
-package me.wkai.prac_character.ui.screen.home
+package me.wkai.prac_character.ui.screen.chara
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
@@ -18,7 +18,7 @@ import javax.inject.Inject
 //@HiltViewModel: 有使用Hilt的ViewModel需要加 (會幫處理好ViewModelProvider.Factory的東西)
 //@Inject 在class用表示此class是可被注入的
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class CharaViewModel @Inject constructor(
 	//注入_角色存儲庫(所以在ui創vm時不用自己處理Factory的東西了)
 	private val repository:CharaRepository,
 	private val dao:CharaDao,

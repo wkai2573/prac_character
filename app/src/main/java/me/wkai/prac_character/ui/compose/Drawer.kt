@@ -1,11 +1,6 @@
 package me.wkai.prac_character.ui.compose
 
-import android.net.Uri
-import android.text.TextUtils.substring
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -14,14 +9,15 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.launch
 import me.wkai.prac_character.ui.screen.Screen
+
 
 @Composable
 fun Drawer(
@@ -44,10 +40,14 @@ fun Drawer(
 		restoreState = true
 	}
 
+	val context = LocalContext.current
+	val scroll = rememberScrollState()
+
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.background(MaterialTheme.colors.background)
+			.verticalScroll(state = scroll)
 	) {
 		Text(
 			text = "Screen",
