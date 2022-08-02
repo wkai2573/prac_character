@@ -1,5 +1,6 @@
 package me.wkai.prac_character.data.db
 
+import android.database.Cursor
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import me.wkai.prac_character.data.model.Chara
@@ -13,14 +14,21 @@ interface CharaDao {
 	fun getCharaList_noFlow():List<Chara>
 
 	@Query("SELECT * FROM chara WHERE actor = :actor")
-	suspend fun getCharaById(actor:String):Chara?
+	fun getCharaById(actor:String):Chara?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insertChara(chara:Chara)
+	fun insertChara(chara:Chara):Long
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insertCharaList(charaList:List<Chara>)
+	fun insertCharaList(charaList:List<Chara>)
 
 	@Delete
-	suspend fun deleteChara(chara:Chara)
+	fun deleteChara(chara:Chara)
+
+
+	//==ContentProvider用==
+
+	@Query("SELECT * FROM chara")
+	fun getCharaList_cursor():Cursor
+
 }

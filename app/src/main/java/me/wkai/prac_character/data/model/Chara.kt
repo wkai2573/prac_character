@@ -1,5 +1,6 @@
 package me.wkai.prac_character.data.model
 
+import android.content.ContentValues
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -8,7 +9,7 @@ import androidx.room.util.TableInfo
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-@Entity(tableName = "chara")
+@Entity(tableName = Chara.TABLE_NAME)
 @JsonClass(generateAdapter = true)
 data class Chara(
 
@@ -89,6 +90,10 @@ data class Chara(
 	@Json(name = "yearOfBirth")
 	val yearOfBirth:String
 ) {
+	companion object {
+		const val TABLE_NAME = "chara"
+	}
+
 	constructor(
 		actor:String,
 		alive:Boolean,
@@ -126,5 +131,27 @@ data class Chara(
 		wand = Wand("", "", ""),
 		wizard = wizard,
 		yearOfBirth = yearOfBirth
+	)
+
+	constructor(cv:ContentValues) : this(
+		actor = cv.getAsString("actor") ?: "",
+		alive = cv.getAsBoolean("alive") ?: false,
+		alternateActors = listOf(),
+		alternateNames = listOf(),
+		ancestry = cv.getAsString("ancestry") ?: "",
+		dateOfBirth = cv.getAsString("dateOfBirth") ?: "",
+		eyeColour = cv.getAsString("eyeColour") ?: "",
+		gender = cv.getAsString("gender") ?: "",
+		hairColour = cv.getAsString("hairColour") ?: "",
+		hogwartsStaff = cv.getAsBoolean("hogwartsStaff") ?: false,
+		hogwartsStudent = cv.getAsBoolean("hogwartsStudent") ?: false,
+		house = cv.getAsString("house") ?: "",
+		image = cv.getAsString("image") ?: "",
+		name = cv.getAsString("name") ?: "",
+		patronus = cv.getAsString("patronus") ?: "",
+		species = cv.getAsString("species") ?: "",
+		wand = Wand("", "", ""),
+		wizard = cv.getAsBoolean("wizard") ?: false,
+		yearOfBirth = cv.getAsString("yearOfBirth") ?: ""
 	)
 }

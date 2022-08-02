@@ -1,6 +1,9 @@
 package me.wkai.prac_character.ui.screen
 
+import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +25,7 @@ import me.wkai.prac_character.ui.screen.chara.CharaScreen
 import me.wkai.prac_character.ui.screen.home.HomeScreen
 import me.wkai.prac_character.ui.screen.scan.ScanScreen
 import me.wkai.prac_character.ui.theme.prac_characterTheme
+import org.w3c.dom.Text
 
 /**
  * 練習_使用技術
@@ -45,6 +49,17 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState:Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		//Sharesheet傳入處理
+		when (intent?.action) {
+			Intent.ACTION_SEND -> {
+				if (intent.type == "text/plain") {
+					val intentText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+					Log.i("@@@", "Sharesheet傳入文字: $intentText")
+				}
+			}
+			else -> {}
+		}
 
 		//註冊廣播
 		AppBroadcastReceiver.init(this)
@@ -115,5 +130,6 @@ class MainActivity : ComponentActivity() {
 			}
 		}
 	}
+
 
 }

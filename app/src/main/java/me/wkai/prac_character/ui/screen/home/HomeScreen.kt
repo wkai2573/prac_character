@@ -4,22 +4,28 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.net.Uri
 import android.os.*
 import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.accompanist.flowlayout.FlowRow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import me.wkai.prac_character.util.CharaProvider
 
 @Composable
 fun HomeScreen(navController:NavHostController) {
 
 	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
 
 	FlowRow(
 		modifier = Modifier.padding(8.dp),
@@ -30,15 +36,35 @@ fun HomeScreen(navController:NavHostController) {
 			content = { Text(text = "綁定其他App服務") },
 			onClick = {
 				bindService(context)
-			}
-		)
+			})
 
 		Button(
 			content = { Text(text = "呼叫服務") },
 			onClick = {
 				sendMessage()
-			}
-		)
+			})
+
+		Button(
+			content = { Text(text = "本地ContentProvider取資料") },
+			onClick = {
+				scope.launch(Dispatchers.IO) {
+					val cursor = context.contentResolver.query(
+						CharaProvider.uri,
+						null,null,null,null
+					)
+					if (cursor == null) {
+						Log.i("@@@", "QQ")
+						return@launch
+					}
+					val list = mutableListOf<String>()
+					while (cursor.moveToNext()) {
+						list.add(cursor.getString(0))
+					}
+					cursor.close()
+
+					Log.i("@@@", list.toString())
+				}
+			})
 	}
 }
 
