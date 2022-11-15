@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import androidx.room.util.TableInfo
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -88,7 +87,7 @@ data class Chara(
 
 	@ColumnInfo(name = "yearOfBirth")
 	@Json(name = "yearOfBirth")
-	val yearOfBirth:String
+	val yearOfBirth:String?
 ) {
 	companion object {
 		const val TABLE_NAME = "chara"
