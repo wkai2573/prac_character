@@ -3,6 +3,7 @@ package me.wkai.prac_character.ui.screen
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -56,6 +57,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
 	// 註冊偵測網路改變
 	fun initDetectionNetwork(context:Context) {
+		//初始目前網路連線, 沒連線則執行未連線fun
+		_isNetworkAvailable.value = isNetworkConnected(context)
+		if (!_isNetworkAvailable.value) networkLost()
+		//偵測網路改變
 		val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 		connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
 			override fun onAvailable(network:Network) {
@@ -66,7 +71,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
 					}
 				}
 			}
-
 			override fun onLost(network:Network) {
 				viewModelScope.launch {
 					_isNetworkAvailable.value = false
@@ -74,6 +78,23 @@ class MainViewModel @Inject constructor() : ViewModel() {
 				}
 			}
 		})
+	}
+
+	// 是否連接網路
+	private fun isNetworkConnected(context: Context): Boolean {
+		// register activity with the connectivity manager service
+		val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+		// Returns a Network object corresponding to the currently active default data network.
+		val network = connectivityManager.activeNetwork ?: return false
+		// Representation of the capabilities of an active network.
+		val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+		return when {
+			// Indicates this network uses a Wi-Fi transport, or WiFi has network connectivity
+			activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+			// Indicates this network uses a Cellular transport. or Cellular has network connectivity
+			activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+			else -> false
+		}
 	}
 
 }
