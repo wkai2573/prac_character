@@ -3,6 +3,7 @@
   xmlns:tools="http://schemas.android.com/tools">
 
   <!-- 權限:網路 -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.INTERNET"/>
   <!-- 權限:相機 -->
   <uses-permission android:name="android.permission.CAMERA" />

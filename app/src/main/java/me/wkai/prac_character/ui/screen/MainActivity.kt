@@ -1,17 +1,21 @@
 package me.wkai.prac_character.ui.screen
 
 import android.content.Intent
-import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,8 +28,7 @@ import me.wkai.prac_character.ui.compose.Drawer
 import me.wkai.prac_character.ui.screen.chara.CharaScreen
 import me.wkai.prac_character.ui.screen.home.HomeScreen
 import me.wkai.prac_character.ui.screen.scan.ScanScreen
-import me.wkai.prac_character.ui.theme.prac_characterTheme
-import org.w3c.dom.Text
+import me.wkai.prac_character.ui.theme.AppTheme
 
 /**
  * 練習_使用技術
@@ -65,69 +68,120 @@ class MainActivity : ComponentActivity() {
 		AppBroadcastReceiver.init(this)
 
 		setContent {
-			prac_characterTheme {
-				Surface(
-					modifier = Modifier.fillMaxSize(),
-					color = MaterialTheme.colors.background
-				) {
-					val scope = rememberCoroutineScope()
-					val scaffoldState = rememberScaffoldState() //鷹架state
+			AppTheme {
+				MainContent()
+			}
+		}
+	}
 
-					//nav
-					val navController = rememberNavController()
+	@Composable
+	fun MainContent(
+		mainVM:MainViewModel = hiltViewModel(),
+	) {
+		Surface(
+			modifier = Modifier.fillMaxSize(),
+			color = MaterialTheme.colors.background
+		) {
+			val scope = rememberCoroutineScope()
+			val scaffoldState = rememberScaffoldState() //鷹架state
+			val navController = rememberNavController() //導航
 
-					Scaffold(
-						scaffoldState = scaffoldState,
-						topBar = {
-							TopAppBar(
-								title = { Text(text = "Character 角色", style = MaterialTheme.typography.h6) },
-								backgroundColor = MaterialTheme.colors.primary,
-								navigationIcon = {
-									IconButton(
-										onClick = { scope.launch { scaffoldState.drawerState.open() } },
-										content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
-									)
+			//啟動處理
+			Start(mainVM, scaffoldState)
+
+			//ui
+			Scaffold(
+				scaffoldState = scaffoldState,
+				topBar = {
+					TopAppBar(
+						title = { Text(text = "Character 角色", style = MaterialTheme.typography.h6) },
+						backgroundColor = MaterialTheme.colors.primary,
+						navigationIcon = {
+							IconButton(
+								onClick = { scope.launch { scaffoldState.drawerState.open() } },
+								content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
+							)
+						}
+					)
+				},
+				drawerContent = {
+					Drawer(
+						drawerState = scaffoldState.drawerState,
+						navController = navController,
+					)
+				},
+			) { padding ->
+				UpTipLayout(mainVM) {
+					NavHost(
+						navController = navController,
+						startDestination = Screen.HomeScreen.route,
+						modifier = Modifier.padding(padding),
+					) {
+						//Home
+						composable(route = Screen.HomeScreen.route) {
+							HomeScreen(navController = navController)
+						}
+						//chara
+						composable(route = Screen.CharaScreen.route) {
+							CharaScreen(navController = navController)
+						}
+						//Scan (傳參數範例)
+						composable(
+							route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
+							arguments = listOf(
+								navArgument(name = "fooIndex") {
+									type = NavType.IntType
+									defaultValue = -1
+								},
+								navArgument(name = "fooColor") {
+									type = NavType.IntType
+									defaultValue = -1
 								}
 							)
-						},
-						drawerContent = {
-							Drawer(
-								drawerState = scaffoldState.drawerState,
-								navController = navController,
-							)
-						},
-					) {
-						NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
-							//Home
-							composable(route = Screen.HomeScreen.route) {
-								HomeScreen(navController = navController)
-							}
-							//chara
-							composable(route = Screen.CharaScreen.route) {
-								CharaScreen(navController = navController)
-							}
-							//Scan (傳參數範例)
-							composable(
-								route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
-								arguments = listOf(
-									navArgument(name = "fooIndex") {
-										type = NavType.IntType
-										defaultValue = -1
-									},
-									navArgument(name = "fooColor") {
-										type = NavType.IntType
-										defaultValue = -1
-									}
-								)
-							) {
-								val color = it.arguments?.getInt("fooColor") ?: -1
-								ScanScreen(navController = navController)
-							}
+						) {
+							val color = it.arguments?.getInt("fooColor") ?: -1
+							ScanScreen(navController = navController)
 						}
 					}
-
 				}
 			}
+		}
+	}
+
+	// 上方提示佈局
+	@Composable
+	private fun UpTipLayout(
+		mainVM:MainViewModel,
+		content:@Composable ColumnScope.() -> Unit,
+	) {
+		Column {
+			val upTipState by mainVM.upTipState.collectAsState()
+
+			AnimatedVisibility(
+				visible = upTipState.isShow,
+				enter = fadeIn() + slideInVertically(),
+				exit = fadeOut() + slideOutVertically(),
+			) {
+				Text(
+					modifier = Modifier.fillMaxWidth().background(upTipState.bgc),
+					text = upTipState.text,
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.h5,
+					color = MaterialTheme.colors.background,
+				)
+			}
+			content()
+		}
+	}
+
+
+	// 啟動處理
+	@Composable
+	private fun Start(mainVM:MainViewModel, scaffoldState:ScaffoldState) {
+		val context = LocalContext.current
+		LaunchedEffect(key1 = true) {
+			//網路偵測
+			mainVM.initDetectionNetwork(context)
 		}
 	}
 
