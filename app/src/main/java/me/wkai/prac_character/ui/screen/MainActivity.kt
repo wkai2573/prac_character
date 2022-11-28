@@ -73,117 +73,115 @@ class MainActivity : ComponentActivity() {
 			}
 		}
 	}
+}
 
-	@Composable
-	fun MainContent(
-		mainVM:MainViewModel = hiltViewModel(),
+@Composable
+private fun MainContent(
+	mainVM:MainViewModel = hiltViewModel(),
+) {
+	Surface(
+		modifier = Modifier.fillMaxSize(),
+		color = MaterialTheme.colors.background
 	) {
-		Surface(
-			modifier = Modifier.fillMaxSize(),
-			color = MaterialTheme.colors.background
-		) {
-			val scope = rememberCoroutineScope()
-			val scaffoldState = rememberScaffoldState() //鷹架state
-			val navController = rememberNavController() //導航
+		val scope = rememberCoroutineScope()
+		val scaffoldState = rememberScaffoldState() //鷹架state
+		val navController = rememberNavController() //導航
 
-			//啟動處理
-			Start(mainVM, scaffoldState)
+		//啟動處理
+		Start(mainVM, scaffoldState)
 
-			//ui
-			Scaffold(
-				scaffoldState = scaffoldState,
-				topBar = {
-					TopAppBar(
-						title = { Text(text = "Character 角色", style = MaterialTheme.typography.h6) },
-						backgroundColor = MaterialTheme.colors.primary,
-						navigationIcon = {
-							IconButton(
-								onClick = { scope.launch { scaffoldState.drawerState.open() } },
-								content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
-							)
-						}
-					)
-				},
-				drawerContent = {
-					Drawer(
-						drawerState = scaffoldState.drawerState,
-						navController = navController,
-					)
-				},
-			) { padding ->
-				UpTipLayout(mainVM) {
-					NavHost(
-						navController = navController,
-						startDestination = Screen.HomeScreen.route,
-						modifier = Modifier.padding(padding),
+		//ui
+		Scaffold(
+			scaffoldState = scaffoldState,
+			topBar = {
+				TopAppBar(
+					title = { Text(text = "Character 角色", style = MaterialTheme.typography.h6) },
+					backgroundColor = MaterialTheme.colors.primary,
+					navigationIcon = {
+						IconButton(
+							onClick = { scope.launch { scaffoldState.drawerState.open() } },
+							content = { Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer") },
+						)
+					}
+				)
+			},
+			drawerContent = {
+				Drawer(
+					drawerState = scaffoldState.drawerState,
+					navController = navController,
+				)
+			},
+		) { padding ->
+			UpTipLayout(mainVM) {
+				NavHost(
+					navController = navController,
+					startDestination = Screen.HomeScreen.route,
+					modifier = Modifier.padding(padding),
+				) {
+					//Home
+					composable(route = Screen.HomeScreen.route) {
+						HomeScreen(navController = navController)
+					}
+					//chara
+					composable(route = Screen.CharaScreen.route) {
+						CharaScreen(navController = navController)
+					}
+					//Scan (傳參數範例)
+					composable(
+						route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
+						arguments = listOf(
+							navArgument(name = "fooIndex") {
+								type = NavType.IntType
+								defaultValue = -1
+							},
+							navArgument(name = "fooColor") {
+								type = NavType.IntType
+								defaultValue = -1
+							}
+						)
 					) {
-						//Home
-						composable(route = Screen.HomeScreen.route) {
-							HomeScreen(navController = navController)
-						}
-						//chara
-						composable(route = Screen.CharaScreen.route) {
-							CharaScreen(navController = navController)
-						}
-						//Scan (傳參數範例)
-						composable(
-							route = Screen.ScanScreen.route + "?fooIndex={fooIndex}&fooColor={fooColor}",
-							arguments = listOf(
-								navArgument(name = "fooIndex") {
-									type = NavType.IntType
-									defaultValue = -1
-								},
-								navArgument(name = "fooColor") {
-									type = NavType.IntType
-									defaultValue = -1
-								}
-							)
-						) {
-							val color = it.arguments?.getInt("fooColor") ?: -1
-							ScanScreen(navController = navController)
-						}
+						val color = it.arguments?.getInt("fooColor") ?: -1
+						ScanScreen(navController = navController)
 					}
 				}
 			}
 		}
 	}
+}
 
-	// 上方提示佈局
-	@Composable
-	private fun UpTipLayout(
-		mainVM:MainViewModel,
-		content:@Composable ColumnScope.() -> Unit,
-	) {
-		Column {
-			val upTipState by mainVM.upTipState.collectAsState()
+// 上方提示佈局
+@Composable
+private fun UpTipLayout(
+	mainVM:MainViewModel,
+	content:@Composable ColumnScope.() -> Unit,
+) {
+	Column {
+		val upTipState by mainVM.upTipState.collectAsState()
 
-			AnimatedVisibility(
-				visible = upTipState.isShow,
-				enter = fadeIn() + slideInVertically(),
-				exit = fadeOut() + slideOutVertically(),
-			) {
-				Text(
-					modifier = Modifier.fillMaxWidth().background(upTipState.bgc),
-					text = upTipState.text,
-					textAlign = TextAlign.Center,
-					style = MaterialTheme.typography.h5,
-					color = MaterialTheme.colors.background,
-				)
-			}
-			content()
+		AnimatedVisibility(
+			visible = upTipState.isShow,
+			enter = fadeIn() + slideInVertically(),
+			exit = fadeOut() + slideOutVertically(),
+		) {
+			Text(
+				modifier = Modifier.fillMaxWidth().background(upTipState.bgc),
+				text = upTipState.text,
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.h5,
+				color = MaterialTheme.colors.background,
+			)
 		}
+		content()
 	}
+}
 
 
-	// 啟動處理
-	@Composable
-	private fun Start(mainVM:MainViewModel, scaffoldState:ScaffoldState) {
-		val context = LocalContext.current
-		LaunchedEffect(key1 = true) {
-			//網路偵測
-			mainVM.initDetectionNetwork(context)
-		}
+// 啟動處理
+@Composable
+private fun Start(mainVM:MainViewModel, scaffoldState:ScaffoldState) {
+	val context = LocalContext.current
+	LaunchedEffect(key1 = true) {
+		//網路偵測
+		mainVM.initDetectionNetwork(context)
 	}
-
-
 }
